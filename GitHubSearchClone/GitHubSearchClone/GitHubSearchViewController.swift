@@ -24,7 +24,6 @@ class GitHubSearchViewController: UIViewController, StoryboardView {
         searchController.isActive = true
         navigationItem.searchController = searchController
     }
-    
     func bind(reactor: GitHubSearchViewReactor) {
         
         // MARK: View -> Reactor
@@ -35,7 +34,7 @@ class GitHubSearchViewController: UIViewController, StoryboardView {
             .map { Reactor.Action.updateQuery($0)}
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
+
         // tableView의 contentoffSet + frame.height 가 contentSize - 100 보다 큰 경우 다음 페이지 로드
         tableView.rx.contentOffset
             .filter { [weak self] offset in
@@ -59,6 +58,13 @@ class GitHubSearchViewController: UIViewController, StoryboardView {
                 let vc = SFSafariViewController(url: url)
                 self.searchController.present(vc, animated: true)
             })
+            .disposed(by: disposeBag)
+        
+        // MARK : Reactor -> View
+        reactor.state.map { $0.repos }
+            .bind(to: tableView.rx.items(cellIdentifier: "cell")) { indexPath, repo, cell in
+                cell.textLabel?.text = repo
+            }
             .disposed(by: disposeBag)
     }
 }

@@ -24,10 +24,15 @@ final class GitHubSearchViewReactor: Reactor {
     enum Mutation {
         case setQuery(String?)
         case setRepos([String], nextPage: Int?)
+        case setLoadingNextPage(Bool)
+        case appendRepos([String], nextPage: Int?)
     }
     
     struct State {
+        var query: String?
         var repos: [String] = []
+        var nextPage: Int?
+        var isLoadingNextPage: Bool = false
     }
 }
 
@@ -36,7 +41,6 @@ extension GitHubSearchViewReactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .updateQuery(let query):
-            
             return Observable.concat([
                 // 1) State의 query 업데이트
                 Observable.just(.setQuery(query)),
@@ -45,22 +49,54 @@ extension GitHubSearchViewReactor {
                     .take(until: self.action.filter(Action.isUpdateQueryAction(_:)))
                     .map { .setRepos($0.repos, nextPage: $0.nextPage)}
             ])
-            return .empty()
         case .loadNextPage:
-            return .empty()
+            // isLoadingNextPage가 false인 경우 실행하지 않음
+            guard self.currentState.isLoadingNextPage else { return Observable.empty() }
+            guard let page = self.currentState.nextPage else { return Observable.empty()}
+            
+            return Observable.concat([
+                // 1) State의 LoadinNextPage true로
+                Observable.just(.setLoadingNextPage(true)),
+                
+                // 2) repos 배열 append
+                self.search(query: self.currentState.query, page: page)
+                    .take(until: self.action.filter(Action.isUpdateQueryAction(_:)))
+                    .map { .appendRepos($0.repos, nextPage: $0.nextPage)},
+                
+                // 3) State의 LoadinNextPage 다시 false로
+                Observable.just(.setLoadingNextPage(false))
+            ])
         }
     }
     
     func reduce(state: State, mutation: Mutation) -> State {
-        return state
+        
+        var newState = state
+        
+        switch mutation {
+        case .setQuery(let query):
+            newState.query = query
+        case .setRepos(let repos, let nextPage):
+            newState.repos = repos
+            newState.nextPage = nextPage
+        case .setLoadingNextPage(let isLoadingNextPage):
+            newState.isLoadingNextPage = isLoadingNextPage
+        case .appendRepos(let repos, nextPage: let nextPage):
+            newState.repos.append(contentsOf: repos)
+            newState.nextPage = nextPage
+        }
+        
+        return newState
     }
 }
 
 extension GitHubSearchViewReactor {
+    
     func url(for query: String?, page: Int) -> URL? {
         guard let query = query else { return nil }
         return URL(string: "https://api.github.com/search/repositories?q=\(query)&page=\(page)")
     }
+    
     func search(query: String?, page: Int) -> Observable<(repos: [String], nextPage: Int?)> {
         let emptyResult: ([String], Int?) = ([], nil)
         
@@ -92,3 +128,4 @@ extension GitHubSearchViewReactor.Action {
     }
   }
 }
+
