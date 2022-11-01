@@ -17,6 +17,7 @@ final class GitHubSearchViewReactor: Reactor {
     
     enum Action {
         case updateQuery(String?)
+        case loadNextPage
     }
     
     enum Mutation {
@@ -24,7 +25,7 @@ final class GitHubSearchViewReactor: Reactor {
     }
     
     struct State {
-        
+        var repos: [String] = []
     }
 }
 
@@ -33,6 +34,8 @@ extension GitHubSearchViewReactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .updateQuery(let query):
+            return .empty()
+        case .loadNextPage:
             return .empty()
         }
     }
