@@ -90,7 +90,7 @@ extension GitHubSearchViewReactor {
     }
 }
 
-extension GitHubSearchViewReactor {
+private extension GitHubSearchViewReactor {
     
     func url(for query: String?, page: Int) -> URL? {
         guard let query = query else { return nil }

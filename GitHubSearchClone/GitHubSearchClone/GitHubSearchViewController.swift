@@ -24,6 +24,7 @@ class GitHubSearchViewController: UIViewController, StoryboardView {
         searchController.isActive = true
         navigationItem.searchController = searchController
     }
+    
     func bind(reactor: GitHubSearchViewReactor) {
         
         // MARK: View -> Reactor
@@ -46,7 +47,16 @@ class GitHubSearchViewController: UIViewController, StoryboardView {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        // View
+        // MARK: Reactor -> View
+        
+        reactor.state.map { $0.repos }
+            .bind(to: tableView.rx.items(cellIdentifier: "cell")) { indexPath, repo, cell in
+                cell.textLabel?.text = repo
+            }
+            .disposed(by: disposeBag)
+        
+        
+        // MARK: View
         tableView.rx.itemSelected
             .subscribe(onNext: { [weak self, weak reactor] indexPath in
                 guard let self = self else { return }
@@ -58,13 +68,6 @@ class GitHubSearchViewController: UIViewController, StoryboardView {
                 let vc = SFSafariViewController(url: url)
                 self.searchController.present(vc, animated: true)
             })
-            .disposed(by: disposeBag)
-        
-        // MARK : Reactor -> View
-        reactor.state.map { $0.repos }
-            .bind(to: tableView.rx.items(cellIdentifier: "cell")) { indexPath, repo, cell in
-                cell.textLabel?.text = repo
-            }
             .disposed(by: disposeBag)
     }
 }

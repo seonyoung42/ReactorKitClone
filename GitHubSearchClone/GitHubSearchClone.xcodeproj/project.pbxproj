@@ -64,9 +64,9 @@
 			children = (
 				2B7D1E232910F89C005A5FDC /* AppDelegate.swift */,
 				2B7D1E252910F89C005A5FDC /* SceneDelegate.swift */,
+				2B7D1E292910F89C005A5FDC /* Main.storyboard */,
 				2B7D1E372910F8BE005A5FDC /* GitHubSearchViewController.swift */,
 				2B7D1E392910FA90005A5FDC /* GitHubSearchViewReactor.swift */,
-				2B7D1E292910F89C005A5FDC /* Main.storyboard */,
 				2B7D1E2C2910F89F005A5FDC /* Assets.xcassets */,
 				2B7D1E2E2910F89F005A5FDC /* LaunchScreen.storyboard */,
 				2B7D1E312910F89F005A5FDC /* Info.plist */,
