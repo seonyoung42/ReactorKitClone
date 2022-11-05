@@ -39,15 +39,20 @@ class CounterViewController: UIViewController, StoryboardView {
             .bind(to: countLabel.rx.text)
             .disposed(by: disposeBag)
         
+//        reactor.state.map { $0.isLoading }
+//            .subscribe(onNext: { [weak self] isLoading in
+//                if isLoading {
+//                    self?.activityView.isHidden = false
+//                    self?.activityView.startAnimating()
+//                } else {
+//                    self?.activityView.isHidden = true
+//                }
+//            })
+//            .disposed(by: disposeBag)
+        
         reactor.state.map { $0.isLoading }
-            .subscribe(onNext: { [weak self] isLoading in
-                if isLoading {
-                    self?.activityView.isHidden = false
-                    self?.activityView.startAnimating()
-                } else {
-                    self?.activityView.isHidden = true
-                }
-            })
+            .distinctUntilChanged()
+            .bind(to: activityView.rx.isAnimating)
             .disposed(by: disposeBag)
         
         reactor.state.map { $0.alertMessage }
@@ -64,6 +69,6 @@ class CounterViewController: UIViewController, StoryboardView {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        activityView.isHidden = true
+//        activityView.isHidden = true
     }
 }
