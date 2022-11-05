@@ -28,7 +28,7 @@ class CounterViewModel: Reactor {
     struct State {
         var count = 0
         var isLoading = false
-        var alertMessage: String? = nil
+        @Pulse var alertMessage: String?
     }
 }
 

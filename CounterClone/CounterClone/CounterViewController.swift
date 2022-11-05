@@ -39,24 +39,13 @@ class CounterViewController: UIViewController, StoryboardView {
             .bind(to: countLabel.rx.text)
             .disposed(by: disposeBag)
         
-//        reactor.state.map { $0.isLoading }
-//            .subscribe(onNext: { [weak self] isLoading in
-//                if isLoading {
-//                    self?.activityView.isHidden = false
-//                    self?.activityView.startAnimating()
-//                } else {
-//                    self?.activityView.isHidden = true
-//                }
-//            })
-//            .disposed(by: disposeBag)
-        
         reactor.state.map { $0.isLoading }
             .distinctUntilChanged()
             .bind(to: activityView.rx.isAnimating)
             .disposed(by: disposeBag)
-        
-        reactor.state.map { $0.alertMessage }
-            .filter { $0 != nil }
+
+        reactor.pulse(\.$alertMessage)
+//            .compactMap { $0 }
             .subscribe(onNext: { [weak self] message in
                 let activityVC = UIAlertController(title: nil, message: message, preferredStyle: .alert)
                 let action = UIAlertAction(title: "ok", style: .default)
@@ -64,11 +53,9 @@ class CounterViewController: UIViewController, StoryboardView {
                 self?.present(activityVC, animated: false)
             })
             .disposed(by: disposeBag)
-        
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-//        activityView.isHidden = true
     }
 }
