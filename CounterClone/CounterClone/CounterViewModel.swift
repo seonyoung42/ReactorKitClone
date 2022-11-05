@@ -59,13 +59,17 @@ extension CounterViewModel {
             
         case .increaseValue:
             newState.count += 1
+            
         case .decreaseValue:
             newState.count -= 1
+            
         case .startLoading(let isLoading):
             newState.isLoading = isLoading
+            
         case .presentAlertMessage(let message):
             newState.alertMessage = message
         }
+        
         return newState
     }
 }

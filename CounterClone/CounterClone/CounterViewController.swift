@@ -34,9 +34,9 @@ class CounterViewController: UIViewController, StoryboardView {
         
         // MARK: ViewModel -> View
         reactor.state.map { $0.count }
-            .subscribe(onNext: { [weak self] count in
-                self?.countLabel.text = count.description
-            })
+            .distinctUntilChanged()
+            .map { $0.description }
+            .bind(to: countLabel.rx.text)
             .disposed(by: disposeBag)
         
         reactor.state.map { $0.isLoading }
